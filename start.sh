@@ -1,29 +1,16 @@
 #!/bin/bash
 
-# Update and install dependencies
-sudo apt update && sudo apt upgrade -y
-sudo apt install -y openssh-server wget curl
+# Start SSH service
+service ssh restart
 
-# Set root password
-echo "root:samir090" | sudo chpasswd
+# Authenticate Ngrok (Replace with your actual Ngrok token)
+ngrok authtoken 2lKjA15AAL3kFG0cbOpfTJGbewT_3PjMCSs55KCHQ2PKkoVdS
 
-# Allow SSH password authentication
-sudo sed -i 's/^#PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
-sudo sed -i 's/^PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-
-# Restart SSH service
-sudo service ssh restart
-
-# Download and install Ngrok
-wget -O /tmp/ngrok.zip https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-stable-linux-amd64.zip
-unzip /tmp/ngrok.zip -d /usr/local/bin/
-chmod +x /usr/local/bin/ngrok
-
-# Start Ngrok with auto-restart
+# Start Ngrok in a loop to keep it running
 while true; do
     ngrok tcp 22 --log=stdout > /dev/null 2>&1
-    sleep 2  # Short delay before restart if Ngrok crashes
+    sleep 2  # Restart delay in case of failure
 done &
 
-# Keep script running indefinitely
+# Keep the container running
 tail -f /dev/null
