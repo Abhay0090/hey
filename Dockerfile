@@ -29,7 +29,7 @@ RUN wget -O /tmp/ngrok.zip https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-stable-lin
 ENV NGROK_CONFIG="/tmp/ngrok.yml"
 RUN ngrok authtoken 2lKjA15AAL3kFG0cbOpfTJGbewT_3PjMCSs55KCHQ2PKkoVdS --config $NGROK_CONFIG
 
-# Allow all incoming and outgoing traffic
+# 🔴 Run iptables BEFORE switching users to avoid permission issues
 RUN iptables -P INPUT ACCEPT && \
     iptables -P OUTPUT ACCEPT && \
     iptables -P FORWARD ACCEPT && \
@@ -38,7 +38,7 @@ RUN iptables -P INPUT ACCEPT && \
 # Expose all ports
 EXPOSE 0-65535
 
-# Run SSH and Ngrok as non-root user (Fix for CKV_DOCKER_3 & CKV_CHOREO_1)
+# 🔵 Switch to non-root user AFTER running privileged commands
 USER 10014
 
 # Start SSH and Ngrok on container startup
