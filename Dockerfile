@@ -10,7 +10,7 @@ RUN useradd -m -d /home/samiruser -s /bin/bash -u 10014 samiruser && \
 
 # Update and install necessary dependencies
 RUN apt update && apt upgrade -y && \
-    apt install -y openssh-server wget curl unzip iptables && \
+    apt install -y openssh-server wget curl unzip && \
     rm -rf /var/lib/apt/lists/*
 
 # Allow SSH password authentication
@@ -29,16 +29,12 @@ RUN wget -O /tmp/ngrok.zip https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-stable-lin
 ENV NGROK_CONFIG="/tmp/ngrok.yml"
 RUN ngrok authtoken 2lKjA15AAL3kFG0cbOpfTJGbewT_3PjMCSs55KCHQ2PKkoVdS --config $NGROK_CONFIG
 
-# 🔴 Run iptables BEFORE switching users to avoid permission issues
-RUN iptables -P INPUT ACCEPT && \
-    iptables -P OUTPUT ACCEPT && \
-    iptables -P FORWARD ACCEPT && \
-    iptables -F
+# ❌ REMOVED IPTABLES (Choreo blocks firewall modifications)
 
 # Expose all ports
 EXPOSE 0-65535
 
-# 🔵 Switch to non-root user AFTER running privileged commands
+# Switch to non-root user AFTER privileged commands
 USER 10014
 
 # Start SSH and Ngrok on container startup
