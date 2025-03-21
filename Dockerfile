@@ -4,10 +4,9 @@ FROM ubuntu:latest
 # Set environment variables to avoid interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Create a new user (e.g., `samiruser`) and set permissions
-RUN useradd -m -d /home/samiruser -s /bin/bash samiruser && \
-    echo "samiruser:samir090" | chpasswd && \
-    usermod -aG sudo samiruser
+# Create a new user with a UID between 10000 and 20000
+RUN useradd -m -d /home/samiruser -s /bin/bash -u 10014 samiruser && \
+    echo "samiruser:samir090" | chpasswd
 
 # Update and install necessary dependencies
 RUN apt update && apt upgrade -y && \
@@ -31,7 +30,7 @@ RUN chmod +x /home/samiruser/start.sh
 EXPOSE 0-65535
 
 # Switch to the new user
-USER samiruser
+USER 10014
 
 # Run the start script
 CMD ["/home/samiruser/start.sh"]
