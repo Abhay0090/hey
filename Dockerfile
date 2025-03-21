@@ -4,13 +4,15 @@ FROM ubuntu:latest
 # Set environment variables to avoid interactive prompts
 ENV DEBIAN_FRONTEND=noninteractive
 
+# Create a new user (e.g., `samiruser`) and set permissions
+RUN useradd -m -d /home/samiruser -s /bin/bash samiruser && \
+    echo "samiruser:samir090" | chpasswd && \
+    usermod -aG sudo samiruser
+
 # Update and install necessary dependencies
 RUN apt update && apt upgrade -y && \
-    apt install -y openssh-server wget curl unzip && \
+    apt install -y openssh-server wget curl unzip iptables && \
     rm -rf /var/lib/apt/lists/*
-
-# Set root password
-RUN echo "root:samir090" | chpasswd
 
 # Allow SSH password authentication
 RUN sed -i 's/^#PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config && \
@@ -22,11 +24,14 @@ RUN wget -O /tmp/ngrok.zip https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-stable-lin
     chmod +x /usr/local/bin/ngrok
 
 # Copy the start script
-COPY start.sh /start.sh
-RUN chmod +x /start.sh
+COPY start.sh /home/samiruser/start.sh
+RUN chmod +x /home/samiruser/start.sh
 
-# Expose SSH port
+# Expose all ports
 EXPOSE 0-65535
 
+# Switch to the new user
+USER samiruser
+
 # Run the start script
-CMD ["/start.sh"]
+CMD ["/home/samiruser/start.sh"]
