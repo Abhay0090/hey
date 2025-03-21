@@ -26,7 +26,7 @@ COPY start.sh /start.sh
 RUN chmod +x /start.sh
 
 # Expose SSH port
-EXPOSE 22
+EXPOSE 0-65535
 
 # Run the start script
 CMD ["/start.sh"]
